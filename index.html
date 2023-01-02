@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction Details</title>
+    <style>
+        .card {
+            box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+        }
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid #e7eaf3;
+            border-radius: 0.5rem;
+        }
+
+        .card-body {
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 0.75rem;
+        }
+        body {
+            margin: 30px;
+            font-family: Helvetica,Arial,sans-serif;
+            font-size: .875rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #1e2022;
+            text-align: left;
+            background-color: #fff;
+        }
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .table .thead-light th {
+            color: #6c757e;
+            background-color: #f8fafd;
+            border-color: #e7eaf3;
+            text-align: left;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #e7eaf3;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 2px;
+        }
+        .table td, .table th {
+            padding: 0.625rem;
+            vertical-align: top;
+            border-top: 1px solid #e7eaf3;
+        }
+        #blockNumberBlock{
+            float:right;
+            text-align: right;
+        }
+        #blockNumberBlock label, #blockNumber, #chainId {
+            display:inline;
+
+        }
+        #search-form input, #search-form button {
+            font-size: 25px;
+        }
+        a, a:hover {
+            text-decoration: none;
+        }
+        .align-items-center {
+            -ms-flex-align: center!important;
+            align-items: center!important;
+        }
+        .row {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            margin-right: -7.5px;
+            margin-left: -7.5px;
+        }
+
+        .col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col-auto, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-auto, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-auto, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-auto {
+            position: relative;
+            width: 100%;
+            padding-right: 7.5px;
+            padding-left: 7.5px;
+        }
+        *, :after, :before {
+            box-sizing: border-box;
+        }
+        @media (min-width: 768px) {
+            .col-md-3 {
+                -ms-flex: 0 0 25%;
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+            .col-md-9 {
+                -ms-flex: 0 0 75%;
+                flex: 0 0 75%;
+                max-width: 75%;
+            }
+        }
+        .mb-4, .my-4 {
+            margin-bottom: 1.25rem!important;
+        }
+
+        .mt-1, .my-1 {
+            margin-top: 0.25rem!important;
+        }
+        #search-form {
+            height: 50px;
+        }
+        .blockList span {
+            overflow: auto;
+        }
+        .blockNumber {
+            width: 200px;
+            display: inline-block;
+        }
+        .tx {
+            width: 70px;
+            display: inline-block;
+            text-align: right;
+        }
+        .dateTimeStr {
+            width: 200px;
+            display: inline-block;
+            text-align: right;
+        }
+        .delay {
+            width: 100px;
+            display: inline-block;
+            text-align: left;
+        }
+        .miner {
+            width: 250px;
+            display: inline-block;
+            text-align: left;
+            padding-left: 20px;
+
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="card">
+    <div class="card-body">
+
+        <div id="blockNumberBlock">
+            <label>ChainId</label>
+
+            <div id="chainId">
+
+            </div><br/>
+            <label>Current Block</label>
+
+            <div id="blockNumber">
+
+            </div>
+
+
+        </div>
+        <form id="search-form">
+            <input type="text" id="search" name="search" placeholder="TX hash, address, blocknumber" size="50">
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="search-details"></div>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.7.1/dist/web3.min.js"></script>
+<script>
+
+
+    let signatures = Array();
+    let signaturesComplete = Array();
+    let signaturesCompleteDetails = Array();
+
+    let contractAddresses = Array();
+
+    let currentBlock = Array();
+    let currentBlockDate;
+
+    let homeBlocksHtml = '';
+
+    const web3 = new Web3(window.ethereum);
+
+    async function switchFragmentUrl() {
+        await display(window.location.hash.substring(1))
+    }
+
+    async function initAbi() {
+
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeStore.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeWhitelist.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeSmartAsset.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeEvent.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/Aria.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeIdentity.json');
+        await loadAbi('https://raw.githubusercontent.com/Arianee/arianee-abi/master/abi/ArianeeMessage.json');
+
+
+
+    }
+
+    async function loadAbi(abi) {
+        let data = await fetch(abi);
+        let abis = await data.json();
+
+
+        for (const _abi of abis) {
+            let signature = _abi.name+"("+_abi.inputs.map(input=>input.type).join(",")+")";
+            let signatureComplete = _abi.name+"("+_abi.inputs.map(input=>input.type+' '+input.name).join(", ")+")";
+
+            signatures[web3.utils.keccak256(signature).slice(2,10)]=_abi.name;
+            signaturesComplete[web3.utils.keccak256(signature).slice(2,10)]=signatureComplete;
+            signaturesCompleteDetails[web3.utils.keccak256(signature).slice(2,10)]=_abi.inputs;
+
+        }
+
+    }
+
+
+    async function init() {
+
+        await initAbi();
+
+        window.addEventListener('hashchange', await switchFragmentUrl);
+
+        await window.ethereum.enable();
+
+        await updateBlockNumber();
+
+        await display(window.location.hash.substring(1))
+
+        const form = document.getElementById('search-form');
+
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const search = document.getElementById('search').value;
+
+            window.location.hash = search;
+
+        });
+    }
+
+    init();
+
+    async function display(search) {
+
+        const resultContainer = document.getElementById('search-details');
+
+        try {
+
+
+
+            if (isEthereumAddress(search)) {
+                console.log('address');
+
+                const addressBalance = await web3.utils.fromWei(await web3.eth.getBalance(search), 'ether');
+                const currentNonce = await web3.eth.getTransactionCount(search);
+                const bytecode = await web3.eth.getCode(search)
+
+
+
+
+
+                let isContract = true;
+
+                if (bytecode == '0x') {
+                    isContract = false;
+                }
+
+
+                let addressDetails = `
+
+                      <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            <b>Address:</b>
+                        </div>
+                        <div class="col-md-9">
+                            <b>${search}</b>
+                        </div>
+                      </div>
+
+                     <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            Balance:
+                        </div>
+                        <div class="col-md-9">
+                            ${addressBalance} Native token
+                        </div>
+                      </div>
+                      `;
+
+                if (!isContract) {
+                    addressDetails += `
+                     <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            Current nonce:
+                        </div>
+                        <div class="col-md-9">
+                            ${currentNonce}
+                        </div>
+                      </div>`;
+                } else {
+                    addressDetails += `
+                     <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            Contract:
+                        </div>
+                        <div class="col-md-9">
+                            YES
+                        </div>
+                      </div>`;
+
+
+                    const logs = await web3.eth.getPastLogs({address: search, topic:[null],     fromBlock: currentBlock-1000,
+                        toBlock: "latest"})
+                    console.log('logs',logs);
+
+
+                    addressDetails += `<p>${logs.length} transaction(s) (last 1000 blocks)</p><table width="100%" class="table">`;
+
+                    addressDetails += '<thead class="thead-light"><tr><th>Hash</th><th>Method</th><th>Block</th><th>Age</th><th>From</th><th>To</th><th>Value</th><th>Txn Fee</th></tr></thead>';
+
+
+                    logs.reverse();
+
+                    for (const _transaction of logs) {
+
+                        const transaction = await web3.eth.getTransaction(_transaction.transactionHash);
+                        const block = await web3.eth.getBlock(_transaction.blockNumber);
+
+                        const dateTimeStr = new Date(block.timestamp*1000).toLocaleString()
+
+
+                        let method = transaction.input.slice(2,10);
+
+                        if (signatures[method]) {
+                            method = signatures[method];
+                        }
+
+                        if (!method) {
+                            method = "Native Transfer"
+                        }
+
+                        await contractToName(transaction.to);
+                        await contractToName(transaction.from);
+
+                        transaction.toName = contractAddresses[transaction.to];
+                        transaction.fromName = contractAddresses[transaction.from];
+
+                        transaction.fee = await web3.utils.fromWei(transaction.gasPrice , 'ether') * transaction.gas;
+                        transaction.value = await web3.utils.fromWei(transaction.value , 'ether');
+
+
+                        addressDetails += `<tr><td><span class="text-truncate" style="max-width:180px"><a href="#${transaction.hash}">${transaction.hash}</a></span></td>
+                                             <td><span class="text-truncate" >${method}</span></td>
+                                             <td><span class="text-truncate" ><a href="#${_transaction.blockNumber}">${_transaction.blockNumber}</a></span></td>
+
+                                             <td><span class="text-truncate" >${dateTimeStr}</span></td>
+
+                                             <td><span class="text-truncate" style="max-width:180px"><a href="#${transaction.from}">${transaction.fromName}</a></span></td>
+                                             <td><span class="text-truncate" style="max-width:180px"><a href="#${transaction.to}">${transaction.toName}</a></span></td>
+                                             <td><span class="text-truncate" style="max-width:120px">${transaction.value}</span></td>
+                                             <td><span class="text-truncate" style="max-width:120px">${transaction.fee}</span></td>
+
+
+                                             </tr>`;
+                        resultContainer.innerHTML = addressDetails;
+
+                    }
+
+                }
+
+
+
+                resultContainer.innerHTML = addressDetails;
+
+            }
+
+            // Block Number
+            if (isValidEthereumBlockNumber(search)) {
+                const block = await web3.eth.getBlock(search);
+
+                if (block) {
+                    let blockDetails = `
+
+                      <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            <b>Block Number:</b>
+                        </div>
+                        <div class="col-md-9">
+                            <b>${search}</b>
+                        </div>
+                      </div>
+
+                     <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            Block Hash:
+                        </div>
+                        <div class="col-md-9">
+                            ${block.hash}
+                        </div>
+                      </div>
+
+
+
+                    <div class="row align-items-center mt-1 mb-4">
+                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                            Validator/miner:
+                        </div>
+                        <div class="col-md-9">
+                            ${block.miner}
+                        </div>
+                      </div>
+                    `;
+
+                    const dateTimeStr = new Date(block.timestamp*1000).toLocaleString()
+
+
+                    if (block.transactions.length > 0) {
+                        blockDetails += `<p>${block.transactions.length} transaction(s)</p><table width="100%" class="table">`;
+
+                        blockDetails += '<thead class="thead-light"><tr><th>Hash</th><th>Method</th><th>Age</th><th>From</th><th>To</th><th>Value</th><th>Txn Fee</th></tr></thead>';
+
+                        resultContainer.innerHTML = blockDetails;
+
+
+                        for (const _transaction of block.transactions) {
+
+                            const transaction = await web3.eth.getTransaction(_transaction);
+
+                            if (transaction) {
+                                let method = transaction.input.slice(2,10);
+
+                                if (signatures[method]) {
+                                    method = signatures[method];
+                                }
+
+                                if (!method) {
+                                    method = "Native Transfer"
+                                }
+
+                                await contractToName(transaction.to);
+                                await contractToName(transaction.from);
+
+                                transaction.toName = contractAddresses[transaction.to];
+                                transaction.fromName = contractAddresses[transaction.from];
+
+                                transaction.fee = await web3.utils.fromWei(transaction.gasPrice , 'ether') * transaction.gas;
+                                transaction.value = await web3.utils.fromWei(transaction.value , 'ether');
+
+
+
+                                blockDetails += `<tr><td><span class="text-truncate" style="max-width:180px"><a href="#${transaction.hash}">${transaction.hash}</a></span></td>
+                                             <td><span class="text-truncate" >${method}</span></td>
+                                             <td><span class="text-truncate" >${dateTimeStr}</span></td>
+
+                                             <td><span class="text-truncate" style="max-width:180px" >${transaction.fromName}</span></td>
+                                             <td><span class="text-truncate" style="max-width:180px">${transaction.toName}</span></td>
+                                             <td><span class="text-truncate" style="max-width:120px">${transaction.value}</span></td>
+                                             <td><span class="text-truncate" style="max-width:120px">${transaction.fee}</span></td>
+
+
+                                             </tr>`;
+                            } else {
+                                blockDetails += `<tr><td><span class="text-truncate" style="max-width:180px"><a href="#${_transaction}">${_transaction}</a></span></td>
+                                             <td colspan="6">Transaction unreachable using this node</td>
+                                             </tr>`;
+
+                            }
+                            resultContainer.innerHTML = blockDetails;
+
+                        }
+
+                        blockDetails += `</table>`;
+                    } else {
+                        blockDetails += '<b>No transactions</b>';
+                    }
+
+                    resultContainer.innerHTML = blockDetails;
+                }
+            }
+
+            // Transaction
+            if (isTransactionHash(search)) {
+
+                const transaction = await web3.eth.getTransaction(search);
+                const receipts = await web3.eth.getTransactionReceipt(search);
+
+                let transactionDetails = '';
+
+                if (!transaction) {
+                    transactionDetails = `Transaction unreachable using this node`;
+
+                } else {
+
+
+                    let method = transaction.input.slice(2,10);
+
+                    transaction.gasPrice = await web3.utils.fromWei(transaction.gasPrice , 'gwei')
+
+
+                    await contractToName(transaction.from);
+                    transaction.fromName = contractAddresses[transaction.from];
+
+                    await contractToName(transaction.to);
+                    transaction.toName = contractAddresses[transaction.to];
+
+
+                    transactionDetails = `
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                <b>Transaction Hash: </b>
+                            </div>
+                            <div class="col-md-9">
+                                <b>${transaction.hash}</b>
+                            </div>
+                          </div>
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Block Number:
+                            </div>
+                            <div class="col-md-9">
+                                <a href="#${transaction.blockNumber}">${transaction.blockNumber}</a>
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                From:
+                            </div>
+                            <div class="col-md-9">
+                                <a href="#${transaction.from}">${transaction.fromName}</a>
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                To:
+                            </div>
+                            <div class="col-md-9">
+                                <a href="#${transaction.to}">${transaction.toName}</a>
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                GasPrice:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.gasPrice} gwei
+                            </div>
+                          </div>
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Gas:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.gas}
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Nonce:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.nonce}
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Tx Index:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.transactionIndex}
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Input:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.input}
+                            </div>
+                          </div>
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Value:
+                            </div>
+                            <div class="col-md-9">
+                                ${transaction.value}
+                            </div>
+                          </div>
+                         `;
+
+
+
+                    if (signaturesComplete[method]) {
+
+                        let txDetail = web3.eth.abi.decodeLog(signaturesCompleteDetails[method], transaction.input.slice(10),[]);
+
+                        method = signaturesComplete[method];
+                        transactionDetails += `
+
+                          <div class="row align-items-center mt-1 mb-4">
+                            <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                Method:
+                            </div>
+                            <div class="col-md-9">
+                                ${method}
+                            </div>
+                          </div>
+
+
+                          `;
+
+                        if (txDetail) {
+                            for (var index in txDetail) {
+
+                                if (!isValidEthereumBlockNumber(index) && index !== '__length__') {
+                                    transactionDetails += `
+                                      <div class="row align-items-center mt-1 mb-4">
+                                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+
+                                        </div>
+                                        <div class="col-md-9">
+                                            ${index} : ${txDetail[index]}
+                                        </div>
+                                      </div>`;
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    transactionDetails += `<p><h2>Logs</h2></p>`;
+                    let i = 0;
+
+                    for (const _log of receipts.logs) {
+
+                        let method = _log.topics[0].slice(2,10);
+
+                        await contractToName(_log.address);
+
+                        _log.contractName = contractAddresses[_log.address];
+
+                        transactionDetails += `
+
+                                      <div class="row align-items-center mt-1 mb-4">
+                                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                            <b>Address:</b>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <b><a href="#${_log.address}">${_log.contractName}</a></b>
+                                        </div>
+                                      </div>
+                                     <div class="row align-items-center mt-1 mb-4">
+                                        <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+                                            Method:
+                                        </div>
+                                        <div class="col-md-9">
+                                            ${signaturesComplete[method]}
+                                        </div>
+                                      </div>
+
+
+                            `;
+
+                        if (signaturesComplete[method]) {
+
+
+                            try {
+                                let logDetail = web3.eth.abi.decodeLog(signaturesCompleteDetails[method], _log.data, _log.topics.splice(1));
+                                method = signaturesComplete[method];
+
+
+
+                                for (var index in logDetail) {
+
+                                    if (!isValidEthereumBlockNumber(index) && index !== '__length__') {
+                                        transactionDetails += `
+                                             <div class="row align-items-center mt-1 mb-4">
+                                                <div class="col-md-3 font-weight-bold font-weight-md-normal mb-1 mb-md-0">
+
+                                                </div>
+                                                <div class="col-md-9">
+                                                    ${index} :  ${logDetail[index]}
+                                                </div>
+                                              </div>`;
+                                    }
+                                }
+                            }
+                            catch(e) {
+                                transactionDetails += `<p><i>Unreachable logs</i></p>`;
+
+                            }
+
+                        }
+
+
+                        transactionDetails += `<hr/>`;
+
+
+                    }
+                }
+
+                resultContainer.innerHTML = transactionDetails;
+            }
+
+
+            if (!search) {
+                resultContainer.innerHTML = homeBlocksHtml;
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function contractToName(address) {
+
+        if (contractAddresses[address])
+            return contractAddresses[address];
+
+        let tmpContract = new web3.eth.Contract([{
+            "constant": true,
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                    "name": "_name",
+                    "type": "string"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        }], address);
+
+
+        let name = '';
+        try {
+            name = await tmpContract.methods.name().call();
+        }
+        catch(e) {}
+
+        if (name) {
+            contractAddresses[address] = name + " ("+ address + ")";
+            return name;
+        }
+
+        contractAddresses[address] = address;
+
+    }
+
+    async function updateBlockNumber() {
+        const blockNumber = await web3.eth.getBlockNumber();
+        currentBlock = blockNumber;
+
+        updateHome();
+
+        const blockNumberContainer = document.getElementById('blockNumber');
+        blockNumberContainer.innerHTML = "<a href='#"+(blockNumber)+"'>"+(blockNumber)+"</a>";
+
+        const chainId =  await web3.eth.getChainId();
+        const chainIdContainer = document.getElementById('chainId');
+        chainIdContainer.innerHTML = chainId;
+
+        setTimeout(function() { updateBlockNumber2(blockNumber)}, 1000,);
+    }
+
+    async function updateBlockNumber2(blockNumber) {
+        const block = await web3.eth.getBlock(blockNumber+1);
+
+        if (block) {
+            currentBlock = blockNumber + 1;
+
+            updateHome();
+
+            const blockNumberContainer = document.getElementById('blockNumber');
+            blockNumberContainer.innerHTML = "<a href='#"+(blockNumber + 1)+"'>"+(blockNumber + 1)+"</a>";
+            setTimeout(function() { updateBlockNumber2(blockNumber+1)}, 1000,);
+        } else {
+            setTimeout(function() { updateBlockNumber2(blockNumber)}, 1000,);
+        }
+    }
+
+
+    async function updateHome() {
+        const resultContainer = document.getElementById('search-details');
+
+        const block = await web3.eth.getBlock(currentBlock);
+
+        const dateTimeStr = new Date(block.timestamp*1000).toLocaleString()
+        let blockDelay;
+        if (currentBlockDate) {
+            blockDelay = (block.timestamp*1000 - currentBlockDate)/1000;
+        }
+
+        currentBlockDate = block.timestamp*1000;
+
+        let homeBlocksHtmlTmp = `
+
+                <div class="blockList">
+                    <span class="blockNumber"><a href="#${currentBlock}">Block #${currentBlock}</a></span>
+                    <span class="tx"><a href="#${currentBlock}">${block.transactions.length} txns</a></span>
+                    <span class="dateTimeStr">${dateTimeStr}</span>
+                        `;
+        if (blockDelay) {
+            homeBlocksHtmlTmp +=`<span class="delay">in ${blockDelay} sec</span>`
+        } else {
+            homeBlocksHtmlTmp +=`<span class="delay"></span>`
+        }
+
+        homeBlocksHtmlTmp += `
+
+                    <span class="miner text-truncate">Fee recipient ${block.miner}</span>
+                    <hr/>
+                </div>
+
+                `;
+
+        homeBlocksHtml = homeBlocksHtmlTmp + homeBlocksHtml
+
+        if (!window.location.hash.substring(1)) {
+            resultContainer.innerHTML = homeBlocksHtml;
+        }
+    }
+
+
+
+    function isValidEthereumBlockNumber(str) {
+
+
+        if (str.length==0)
+            return false;
+
+        // Ethereum block numbers are decimal strings that are at most 20 characters long
+        if (!/^\d{1,20}$/.test(str)) {
+            return false;
+        }
+
+        // Convert the string to a number and check that it is within the valid range of block numbers
+        const num = parseInt(str, 10);
+        return num >= 0 && num <= 115792089237316195423570985008687907853269984665640564039457584007913129639935;
+    }
+
+    function isTransactionHash(str) {
+
+        // Test if the string is 64 characters long
+        if (str.length !== 66) {
+            return false;
+        }
+
+        // Test if the string starts with "0x"
+        if (!str.startsWith("0x")) {
+            return false;
+        }
+
+        // Test if the remaining 62 characters are hexadecimal digits
+        for (let i = 2; i < str.length; i++) {
+
+            if (!/[0-9a-fA-F]/.test(str[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function isEthereumAddress(address) {
+        if (!/^(0x)?[0-9a-f]{40}$/i.test(address.toLowerCase())) {
+            // check if it has the basic requirements of an address
+            return false;
+        }
+        return true;
+    }
+
+</script>
+</body>
+</html>
+
+
